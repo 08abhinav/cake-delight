@@ -3,6 +3,7 @@ import express from "express"
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import connectDB from "./db/dbConnect.js";
+import swaggerJSDoc from "./lib/swagger.js";
 import cakeRoutes from "./routes/cakeRoutes.js";
 
 const app = express()
@@ -18,7 +19,7 @@ app.use((err, req, res, next)=>{
     }
     return res.status(err.status || 500).json({message: err.message})
 })
-
+app.use('/api/cake/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc))
 app.use("/api/cake", cakeRoutes);
 
 app.get("/", (req, res)=>{
