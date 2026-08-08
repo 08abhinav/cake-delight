@@ -182,7 +182,7 @@ userRoutes.post("/auth/signup", signUpValdiation(), handleSignUp);
  *       404:
  *         description: User not found
  */
-userRoutes.post("/verify-otp", otpValidator, verifyOtp);
+userRoutes.post("/verify-otp", otpValidator(), verifyOtp);
 
 /**
  * @swagger
