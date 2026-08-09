@@ -38,6 +38,7 @@ app.get("/health", (req, res)=>{
     const totalHours = Math.floor(uptimeMs / (1000 * 60 * 60));
 
     return res.status(200).json({
+        serviceName: "User service",
         uptimeInSeconds: totalSeconds,
         uptimeInMinutes: totalMinutes,
         uptimeInHours: totalHours
