@@ -182,7 +182,7 @@ userRoutes.post("/auth/signup", signUpValdiation(), handleSignUp);
  *       404:
  *         description: User not found
  */
-userRoutes.post("/verify-otp", otpValidator(), verifyOtp);
+userRoutes.post("/auth/verify-otp", otpValidator(), verifyOtp);
 
 /**
  * @swagger
@@ -211,7 +211,7 @@ userRoutes.post("/verify-otp", otpValidator(), verifyOtp);
  *       404:
  *         description: User not found
  */
-userRoutes.post("/resend-otp", resendOtp);
+userRoutes.post("/auth/resend-otp", resendOtp);
 
 /**
  * @swagger
@@ -288,6 +288,6 @@ userRoutes.get("/auth/signout", handleSignOut);
  *       403:
  *         description: Forbidden (User is not an admin)
  */
-userRoutes.get("/user-count", authAdmin(), handleUserCount);
+userRoutes.get("/auth/user-count", authAdmin(), handleUserCount);
 
 export default userRoutes;
