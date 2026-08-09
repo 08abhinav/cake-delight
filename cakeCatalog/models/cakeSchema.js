@@ -30,6 +30,10 @@ const cakeSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    estimatedDeliveryTime:{
+        type: Number,
+        required: true
+    },
     image:{
         type: String
     },
