@@ -7,13 +7,13 @@ export const handleCakeEntry = async(req, res, next)=>{
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const {name, description, category, price, availability, image} = req.body;
+        const {name, description, category, price, availability, estimatedDeliveryTime, image} = req.body;
         const entry = await Cake.findOne({name, user: req.user._id});
         if(entry){
             return res.status(409).json({success: false, message: "Entry already exist"})
         }
 
-        const cake = new Cake({name, description, category, price, availability, image, user: req.user._id})
+        const cake = new Cake({name, description, category, price, availability, estimatedDeliveryTime, image, user: req.user._id})
         await cake.save();
 
         res.status(201).json({success: true, message: "entry saved"})
@@ -33,6 +33,21 @@ export const handleCakeDisplay = async(req, res, next)=>{
         });
 
         res.status(200).json({success: true, data: cake})
+    }catch(err){
+        next(err);
+    }
+}
+
+export const handleCakeById = async(req, res, next)=>{
+    try{
+        const {id} = req.params;
+        const product = await Cake.findById(id)
+
+        if(!product){
+            return res.status(404).json({message: "Cake not found"})
+        }
+
+        return res.status(200).json({success: true, data: product})
     }catch(err){
         next(err);
     }
@@ -102,3 +117,41 @@ export const handleEntryDeletion = async(req, res, next)=>{
         next(err);
     }
 }
+
+export const handleCakeAvailability = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    const { quantity } = req.body;
+
+    const cake = await Cake.findOneAndUpdate(
+      {
+        _id: productId,
+        availability: { $gte: quantity }
+      },
+      {
+        $inc: {
+          availability: -quantity
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!cake) {
+      return res.status(400).json({
+        success: false,
+        message: "Cake not found or insufficient availability"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Availability updated",
+      data: cake
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
