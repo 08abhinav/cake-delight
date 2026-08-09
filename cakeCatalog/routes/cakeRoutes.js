@@ -1,8 +1,8 @@
 import express from "express";
 import { authorizedSeller } from "../middleware/auth.js";
 import { cakeEntryValidation } from "../lib/validations.js";
-import { handleCakeDisplay, handleCakeEntry, handleCakeFilter, handleEntryDeletion, 
-    handleEntryUpdation } from "../controllers/cakeController.js";
+import { handleCakeAvailability, handleCakeById, handleCakeDisplay, handleCakeEntry, 
+handleCakeFilter, handleEntryDeletion, handleEntryUpdation } from "../controllers/cakeController.js";
 
 const cakeRoutes = express.Router();
 
@@ -112,38 +112,6 @@ const cakeRoutes = express.Router();
 
 /**
  * @openapi
- * /cakes/addCake:
- *   post:
- *     summary: Add a new cake
- *     tags: [Cakes]
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CakeInput'
- *     responses:
- *       201:
- *         description: Cake successfully created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Cake'
- *       400:
- *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ValidationError'
- *       401:
- *         description: Unauthorized - Seller access required
- */
-cakeRoutes.post("/addCake", authorizedSeller(), cakeEntryValidation(), handleCakeEntry);
-
-/**
- * @openapi
  * /cakes/allCake:
  *   get:
  *     summary: Retrieve all cakes
@@ -197,7 +165,41 @@ cakeRoutes.get("/allCake", handleCakeDisplay);
  *               items:
  *                 $ref: '#/components/schemas/Cake'
  */
-cakeRoutes.get("/filter/", handleCakeFilter);
+cakeRoutes.get("/filter", handleCakeFilter);
+
+cakeRoutes.get("/:id", handleCakeById);
+
+/**
+ * @openapi
+ * /cakes/addCake:
+ *   post:
+ *     summary: Add a new cake
+ *     tags: [Cakes]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CakeInput'
+ *     responses:
+ *       201:
+ *         description: Cake successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cake'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Unauthorized - Seller access required
+ */
+cakeRoutes.post("/addCake", authorizedSeller(), cakeEntryValidation(), handleCakeEntry);
 
 /**
  * @openapi
@@ -261,4 +263,5 @@ cakeRoutes.put("/updateEntry/:id", authorizedSeller(), cakeEntryValidation(), ha
  */
 cakeRoutes.delete("/deleteEntry/:id", authorizedSeller(), handleEntryDeletion);
 
+cakeRoutes.patch("/updateAvailability/:productId", handleCakeAvailability)
 export default cakeRoutes;
