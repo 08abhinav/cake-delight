@@ -1,4 +1,5 @@
 import axios from "axios"
+import {validationResult} from "express-validator"
 import { Cart, Order } from "../models/schema.js";
 
 export const handleCheckoutDisplay = async(req, res, next)=>{
@@ -19,6 +20,10 @@ export const handleCheckoutDisplay = async(req, res, next)=>{
 export const handleCheckout = async(req, res, next)=>{
     try{
         const {_id: userId, email: userEmail} = req.user;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const {houseno, street, city, pincode, state, mobileNumber, paymentType, paymentStatus} = req.body;
         
         const cart = await Cart.findOne({userId})

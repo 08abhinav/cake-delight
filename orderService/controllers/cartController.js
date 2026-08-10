@@ -1,13 +1,17 @@
 import "dotenv/config";
 import axios from "axios";
 import { Cart } from "../models/schema.js";
+import {validationResult} from "express-validator"
 
 export const handleCartInsertion = async (req, res, next) => {
   try {
     const { _id: userId, email: userEmail } = req.user;
 
+    const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
     const { productId, quantity } = req.body;
-
     let product;
 
     try {
@@ -109,7 +113,11 @@ export const handleCartDisplay = async(req, res, next)=>{
 export const handleCartUpdation = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
-    // todo body validator
+
+    const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
     const { productId, quantity } = req.body;
 
     const cart = await Cart.findOne({ userId });
