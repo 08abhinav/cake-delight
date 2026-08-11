@@ -1,5 +1,6 @@
 import { Cake } from "../models/cakeSchema.js";
 import{validationResult} from "express-validator"
+import cloudinary from "../config/cloudinary.js";
 
 export const handleCakeEntry = async(req, res, next)=>{
     try{
@@ -7,13 +8,44 @@ export const handleCakeEntry = async(req, res, next)=>{
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const {name, description, category, price, availability, estimatedDeliveryTime, image} = req.body;
+        const {name, description, category, price, availability, estimatedDeliveryTime} = req.body;
         const entry = await Cake.findOne({name, user: req.user._id});
         if(entry){
             return res.status(409).json({success: false, message: "Entry already exist"})
         }
+        
+        const uploadResult = await new Promise(
+            (resolve, reject) => {
 
-        const cake = new Cake({name, description, category, price, availability, estimatedDeliveryTime, image, user: req.user._id})
+                const stream =
+                    cloudinary.uploader.upload_stream(
+                        {
+                            folder: "cake-delight/cakes",
+                            resource_type: "image"
+                        },
+                        (error, result) => {
+
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
+                        }
+                    );
+
+                stream.end(req.file.buffer);
+            }
+        );
+        const cake = new Cake({
+            name, 
+            description, 
+            category, 
+            price, 
+            availability, 
+            estimatedDeliveryTime, 
+            image: uploadResult.secure_url, 
+            user: req.user._id})
+            
         await cake.save();
 
         res.status(201).json({success: true, message: "entry saved"})
@@ -62,7 +94,7 @@ export const handleCakeFilter = async(req, res, next)=>{
             filter.name = {$regex: name, $options: "i"};
         }
         if(category){
-            filter.category = category;
+            filter.category = {$regex: category, $options: "i"};;
         }
         if(minPrice !== undefined || maxPrice !== undefined){
             filter.price = {}
@@ -85,11 +117,11 @@ export const handleEntryUpdation = async(req, res, next)=>{
             return res.status(400).json({ errors: errors.array() });
         }
         const {id} = req.params;
-        const {name, description, category, price, availability, image} = req.body;
+        const {name, description, category, price, availability, estimatedDeliveryTime, image} = req.body;
 
        const updatedEntry = await Cake.findOneAndUpdate(
             { _id: id, user: req.user._id },
-            { name, description, category, price, availability, image },
+            { name, description, category, price, availability, estimatedDeliveryTime, image },
             { new: true, runValidators: true }
         );
 
@@ -149,6 +181,24 @@ export const handleCakeAvailability = async (req, res, next) => {
       success: true,
       message: "Availability updated",
       data: cake
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const handleMyCakes = async (req, res, next) => {
+  try {
+    const {_id: userId} = req.user;
+    const cakes = await Cake.find({
+      user: userId
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: cakes.length,
+      data: cakes
     });
 
   } catch (err) {
