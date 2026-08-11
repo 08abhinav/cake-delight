@@ -9,6 +9,7 @@ function Signup() {
     username: "",
     email: "",
     password: "",
+    role: "buyer"
   });
 
   const [loading, setLoading] = useState(false);
@@ -80,7 +81,18 @@ function Signup() {
           onChange={handleChange}
           required
         />
+        <label>
+          Account Type
 
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+          >
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+          </select>
+        </label>
         <button type="submit" disabled={loading}>
           {loading ? "Creating account..." : "Signup"}
         </button>
