@@ -192,3 +192,21 @@ export const handleUserCount = async (req, res, next)=>{
         next(err);
     }
 }
+
+export const handleGetCurrentUser = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      data: {
+        _id: req.user._id,
+        email: req.user.email,
+        role: req.user.role,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get current user",
+    });
+  }
+};
