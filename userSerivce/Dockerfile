@@ -12,5 +12,7 @@ COPY . .
 
 RUN npm prune --omit=dev
 
+USER nodejs
+
 EXPOSE 3000
 CMD ["node", "index.js"]
