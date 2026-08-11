@@ -7,9 +7,12 @@ FROM node:20-alpine AS production
 RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 
 WORKDIR /app
-COPY --form=build /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
+COPY . .
 
 RUN npm prune --omit=dev
-EXPOSE 3001
 
+USER nodejs
+
+EXPOSE 3001
 CMD ["node", "index.js"]
