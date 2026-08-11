@@ -3,8 +3,7 @@ import {body} from "express-validator";
 export const signUpValdiation = ()=>[
     body('username').isLength({min: 3}).withMessage("username must be 3 characters long"),
     body('email').isEmail().withMessage("Please enter a valid email"),
-    body('password').isLength({min: 8}).withMessage("password must be 8 characters long"),
-    body('role').isIn(["buyer", "seller", "admin"]).withMessage("role should be either buyer or seller")
+    body('password').isLength({min: 8}).withMessage("password must be 8 characters long")
 ]
 
 export const otpValidator = ()=>[
