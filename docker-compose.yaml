@@ -30,7 +30,7 @@ services:
       context: ./userSerivce
       dockerfile: Dockerfile
     environment:
-      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@userdb:27017/user-db/?authSource=admin
+      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@userdb:27017/user-db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       PORT: ${USER_PORT}
       BREVO_API_KEY: ${BREVO_API_KEY}
@@ -75,7 +75,7 @@ services:
       context: ./cakeCatalog
       dockerfile: Dockerfile
     environment:
-      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@cakedb:27017/cake-db/?authSource=admin
+      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@cakedb:27017/cake-db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
@@ -120,7 +120,7 @@ services:
       context: ./orderService
       dockerfile: Dockerfile
     environment:
-      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@orderdb:27017/order-db/?authSource=admin
+      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@orderdb:27017/order-db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       CAKE_SVC_URL: ${CAKE_URL}
       PORT: ${ORDER_PORT}
@@ -163,7 +163,7 @@ services:
       context: ./ratingService
       dockerfile: Dockerfile
     environment:
-      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@ratingdb:27017/rating-db/?authSource=admin
+      MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@ratingdb:27017/rating-db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       ORDER_SVC_URL: ${ORDER_URL}
       PORT: ${RATING_PORT}
