@@ -2,23 +2,37 @@ import "dotenv/config"
 import axios from "axios"
 import {Rating} from "../models/schema.js"
 
-export const handleRatingDisplay = async(req, res, next)=>{
-    try{
-        const {productId} = req.params;
-        //todo validate productId
+export const handleRatingDisplay = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
 
-        const ratings = await Rating.find({"items.productId": productId});
-        if(ratings.length === 0){
-            return res.status(404).json({success: false, message: "no rating found"})
-        }
+    const ratings = await Rating.find({
+      "items.productId": productId
+    });
 
-        const items = ratings.flatMap(rating => rating.items);
-
-        return res.status(200).json({success: true, data: items})
-    }catch(err){
-        next(err);
+    if (ratings.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      });
     }
-}
+
+    const items = ratings.flatMap((rating) =>
+      rating.items.filter(
+        (item) =>
+          String(item.productId) === String(productId)
+      )
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: items
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const handleRating = async (req, res, next) => {
     try {
@@ -34,14 +48,13 @@ export const handleRating = async (req, res, next) => {
             }
         );
 
-        const orders = response.data.data;
+        const orders = response.data.data || [];
+
         let purchasedItem = null;
 
         for (const order of orders) {
             for (const item of order.items) {
-                if (
-                    String(item.productId) === String(productId)
-                ) {
+                if (String(item.productId) === String(productId)) {
                     purchasedItem = item;
                     break;
                 }
@@ -57,22 +70,40 @@ export const handleRating = async (req, res, next) => {
             });
         }
 
-        const userRating = await Rating.findOneAndUpdate(
-            { userId },
-            {
-                $push: {
-                    items: {
+        let userRating = await Rating.findOne({ userId });
+
+        if (!userRating) {
+            userRating = await Rating.create({
+                userId,
+                items: [
+                    {
                         productId,
                         productName: purchasedItem.productName,
                         rating
                     }
-                }
-            },
-            {
-                new: true,
-                upsert: true
+                ]
+            });
+        } else {
+            const existingItemIndex = userRating.items.findIndex(
+                item =>
+                    String(item.productId) === String(productId)
+            );
+
+            if (existingItemIndex !== -1) {
+                // User already rated this cake.
+                // Update the existing rating.
+                userRating.items[existingItemIndex].rating = rating;
+            } else {
+                // First rating for this cake.
+                userRating.items.push({
+                    productId,
+                    productName: purchasedItem.productName,
+                    rating
+                });
             }
-        );
+
+            await userRating.save();
+        }
 
         return res.status(201).json({
             success: true,
