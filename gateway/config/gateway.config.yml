@@ -1,0 +1,132 @@
+http:
+  port: 8080
+
+apiEndpoints:
+  user:
+    host: '*'
+    paths:
+      - '/api/user/*'
+
+  cake:
+    host: '*'
+    paths:
+      - '/api/cake/*'
+
+  cart:
+    host: '*'
+    paths:
+      - '/api/cart/*'
+
+  order:
+    host: '*'
+    paths:
+      - '/api/order/*'
+  
+  rating:
+    host: '*'
+    paths:
+      - '/api/rating/*'
+
+serviceEndpoints:
+  userService:
+    url: '${USER_URL}'
+
+  cakeService:
+    url: '${CAKE_URL}'
+
+  orderService:
+    url: '${ORDER_URL}'
+
+  ratingService:
+    url: '${RATING_URL}'
+
+policies:
+  - cors
+  - proxy
+
+pipelines:
+
+  userPipeline:
+    apiEndpoints:
+      - user
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+              allowedHeaders: 'Content-Type,Authorization'
+              credentials: true
+
+      - proxy:
+          - action:
+              serviceEndpoint: userService
+              changeOrigin: true
+              stripPath: false
+
+  cakePipeline:
+    apiEndpoints:
+      - cake
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+              allowedHeaders: 'Content-Type,Authorization'
+              credentials: true
+
+      - proxy:
+          - action:
+              serviceEndpoint: cakeService
+              changeOrigin: true
+              stripPath: false
+
+  cartPipeline:
+    apiEndpoints:
+      - cart
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+              allowedHeaders: 'Content-Type,Authorization'
+              credentials: true
+
+      - proxy:
+          - action:
+              serviceEndpoint: orderService
+              changeOrigin: true
+              stripPath: false
+
+  orderPipeline:
+    apiEndpoints:
+      - order
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+              allowedHeaders: 'Content-Type,Authorization'
+              credentials: true
+
+      - proxy:
+          - action:
+              serviceEndpoint: orderService
+              changeOrigin: true
+              stripPath: false
+  
+  ratingPipeline:
+    apiEndpoints:
+      - rating
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+              allowedHeaders: 'Content-Type,Authorization'
+              credentials: true
+
+      - proxy:
+          - action:
+              serviceEndpoint: ratingService
+              changeOrigin: true
+              stripPath: false
