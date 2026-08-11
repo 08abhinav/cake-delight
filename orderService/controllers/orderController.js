@@ -1,12 +1,20 @@
-import axios from "axios"
-import {validationResult} from "express-validator"
+import axios from "axios";
+import {Kafka} from "kafkajs";
+import {validationResult} from "express-validator";
 import { Cart, Order } from "../models/schema.js";
+
+const kafka = new Kafka({
+    clientId: "order-svc",
+    brokers: ["localhost:9092"]
+})
+
+const orderProducer = kafka.producer();
 
 export const handleCheckoutDisplay = async(req, res, next)=>{
     try{
         const {_id: userId} = req.user;
 
-        const orders = await Order.find({userId});
+        const orders = await Order.find({userId}).sort({ createdAt: -1 });
         if(orders.length === 0){
             return res.status(200).json({message: "No order found", data: orders})
         }
@@ -27,12 +35,13 @@ export const handleCheckout = async(req, res, next)=>{
         const {houseno, street, city, pincode, state, mobileNumber, paymentType, paymentStatus} = req.body;
         
         const cart = await Cart.findOne({userId})
+
         if(!cart || cart.items.length === 0){
             return res.status(404).json({success: false, message: "Your cart is empty"})
         }
 
         if((paymentType === "UPI" || paymentType === "NET BANKING") && paymentStatus == "UNPAID") {
-                return res.status(400).json({success: false, message: "please complete the payment first"})
+            return res.status(400).json({success: false, message: "please complete the payment first"})
         }
 
         if (paymentType === "COD" && paymentStatus !== "UNPAID") {
@@ -42,12 +51,16 @@ export const handleCheckout = async(req, res, next)=>{
             });
         }
 
+        const maxDeliveryHours = Math.max(...cart.items.map((item) => item.estimatedDeliveryTime));
+
+        const estimatedDeliveryTime = new Date(Date.now() + maxDeliveryHours * 60 * 60 * 1000);
+
         const order = await Order.create({
             userId, 
             userEmail,
             items: cart.items,
             totalAmount: cart.totalAmount,
-            estimatedDeliveryTime: cart.items.estimatedDeliveryTime,
+            estimatedDeliveryTime: estimatedDeliveryTime,
             address:{
                 houseno, 
                 street, 
@@ -71,6 +84,32 @@ export const handleCheckout = async(req, res, next)=>{
             }
             await Cart.findOneAndDelete({userId})
         }
+
+        try{
+            await orderProducer.connect();
+            await orderProducer.send({
+                topic: "order-placed-successfully",
+                messages:[
+                    {
+                        value: JSON.stringify({
+                            orderId: order._id.toString(),
+                            userEmail: order.userEmail,
+                            items: order.items.map(item => ({
+                                productName: item.productName,
+                                quantity: item.quantity
+                            })),
+                            totalAmount: order.totalAmount,
+                            estimatedDeliveryTime: order.estimatedDeliveryTime,
+                            paymentStatus: order.paymentStatus,
+                            paymentType: order.paymentType
+                        })
+                    }
+                ]
+            })
+        }catch(kafkaError){
+            console.error("Order created but Kafka publishing failed:", kafkaError.message);
+        }
+
         res.status(201).json({success: true, message: "order place", data: order})
     }catch(err){
         if (err.response) {
@@ -79,7 +118,6 @@ export const handleCheckout = async(req, res, next)=>{
         } else {
             console.log("Error:", err.message);
         }
-
         next(err);
     }
-} 
+}   
