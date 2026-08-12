@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-svc-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: kafka-svc
+          image: ataksuki/kafka-svc
+          env:
+            - name: KAFKA_BROKER
+              value: "kafka-service:9092"
+      restartPolicy: OnFailure
