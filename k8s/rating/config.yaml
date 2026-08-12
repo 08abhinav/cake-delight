@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rating-config
+  namespace: dev
+data:
+  PORT: "3003"

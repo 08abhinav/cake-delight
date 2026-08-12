@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cake
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cake
+  template:
+    metadata:
+      labels:
+        app: cake
+    spec:
+      containers:
+        - name: cake-svc
+          image: ataksuki/cake-svc:latest
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: cake-config
+            - secretRef:
+                name: cake-secret
