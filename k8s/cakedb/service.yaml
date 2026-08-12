@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-cake-svc
+  namespace: dev
+  labels:
+    name: mongo-cake-svc
+spec:
+  clusterIP: None
+  selector:
+    role: cake-db
+  ports:
+    - port: 27020
+      targetPort: 27017

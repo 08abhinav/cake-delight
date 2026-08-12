@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cake-db
+  namespace: dev
+  labels:
+    app: mongo
+spec:
+  serviceName: mongo-cake-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      role: cake-db
+  template:
+    metadata:
+      labels:
+        role: cake-db
+    spec:
+      containers:
+        - name: cake-mongodb
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          envFrom:
+            - configMapRef:
+                name: cake-db-config
+            - secretRef:
+                name: cake-db-secret
+          volumeMounts:
+            - name: cake-mongo-persistent-storage
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: cake-mongo-persistent-storage
+      spec:
+        storageClassName: cake-mongodb-storage
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: order-db
+  namespace: dev
+  labels:
+    app: mongo
+spec:
+  serviceName: mongo-order-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      role: order-db
+  template:
+    metadata:
+      labels:
+        role: order-db
+    spec:
+      containers:
+        - name: order-mongodb
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          envFrom:
+            - configMapRef:
+                name: order-db-config
+            - secretRef:
+                name: order-db-secret
+          volumeMounts:
+            - name: order-mongo-persistent-storage
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: order-mongo-persistent-storage
+      spec:
+        storageClassName: order-mongodb-storage
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
