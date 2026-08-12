@@ -1,11 +1,13 @@
+import "dotenv/config"
 import axios from "axios";
 import {Kafka} from "kafkajs";
 import {validationResult} from "express-validator";
 import { Cart, Order } from "../models/schema.js";
 
+const URL = process.env.KAFKA_BROKER
 const kafka = new Kafka({
     clientId: "order-svc",
-    brokers: ["localhost:9092"]
+    brokers: [URL]
 })
 
 const orderProducer = kafka.producer();

@@ -123,6 +123,7 @@ services:
       MONGO_URL: mongodb://${USERNAME}:${PASSWORD}@orderdb:27017/order-db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       CAKE_SVC_URL: ${CAKE_URL}
+      KAFKA_BROKER: ${KAFKA_BROKER}
       PORT: ${ORDER_PORT}
     ports:
       - "3002:3002"
