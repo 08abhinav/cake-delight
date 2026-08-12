@@ -2,8 +2,6 @@ import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import swaggerUi from "swagger-ui-express";
-import swaggerJSDoc from "./lib/swagger.js";
 import connectDB from "./db/dbConnection.js";
 import userRoutes from "./routes/userRoutes.js";
 
@@ -23,7 +21,6 @@ app.use((err, req, res, next)=>{
     res.status(err.status || 500).json({message: err.message})
 })
 
-app.use('/api/user/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc))
 app.use("/api/user", userRoutes);
 
 app.get("/", (req, res)=>{
