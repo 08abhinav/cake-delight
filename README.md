@@ -31,6 +31,7 @@ Express's greatest strength is simplicity and flexibility, it means a minimalist
 
 ```plaintext
 | Public endpoints | Target Service | Port |
+|                  |                |      |
 | /api/user/*      | user service   | 3000 | 
 | /api/cake/*      | cake service   | 3001 | 
 | /api/cart/*      | order service  | 3002 | 
@@ -45,28 +46,28 @@ Express's greatest strength is simplicity and flexibility, it means a minimalist
 
 - Overview: Manages user authentication, authorization and role-based access control.
 - Key feature: Ensures clear segmentation between user roles, for example: Buyers can browse cakes and make purchase, while Sellers are authorized to manage thier bakery profile and list new cakes.
-- Explore more about user service **[visit here](userService/README.md)**.
+- Explore more about user service **[visit here](userSerivce/README.md)**.
 
 ---
 
 ### Cake Catalog: 
 
 - Overview: Manages cake listings, categories, and search filters (by name, category, or price range), Sellers have extended privileges to create, update, and delete their cake listings.
-- Explore more about cake catalog service **[visit here](cakeCatalog/READE.md)**
+- Explore more about cake catalog service **[visit here](cakeCatalog/README.md)**
 
 ---
 
 ### Cart & Order service: 
 
 - Overview: Manages user shopping carts and order processing, Maintains isolated, persistent cart states for individual buyers and handles the transition from cart checkout to order creation.
-- Explore more about cart and order service **[visit here](orderService/READE.md)**
+- Explore more about cart and order service **[visit here](orderService/README.md)**
 
 ---
 
 ### Rating service: 
 
 - Overview: Handles customer reviews and ratings for purchased cake, Aggregates user feedback and syncs updated scores back to the Cake Catalog Service.
-- Explore moer about rating service **[visit here](ratingService/READE.md)**
+- Explore moer about rating service **[visit here](ratingService/README.md)**
 
 ---
 
@@ -86,6 +87,7 @@ Express's greatest strength is simplicity and flexibility, it means a minimalist
 
 ```plaintext
 | Service           | Technology                                                |
+|                   |                                                           |
 | Frontend          | React.js, vite                                            |
 | Backend           | Node.js, Express.js                                       |
 | Database          | MongoDB                                                   |
